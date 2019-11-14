@@ -7,66 +7,66 @@ using ll = long long;
 #define AC ios::sync_with_stdio(0),cin.tie(0);
 
 vector<vector<int>> v,bcc;
+vector<pair<int,int>> edge;
 vector<int> low,tag;
-vector<unordered_map<int,int>> vn;
-int c=1,num=0;
+int c=1;
 stack<int> s;
 
-void dfs(int x,int par)
+void dfs(int x,int be)
 {
     low[x]=tag[x]=c++,s.emplace(x);
     for(auto e:v[x])
     {
-        if(!tag[e])
+        int v=edge[e].second;
+        if(!tag[v])
         {
-            dfs(e,x);
-            low[x]=min(low[x],low[e]);
-            if(low[e]>tag[x])
+            dfs(v,e^1);
+            low[x]=min(low[x],low[v]);
+            if(low[v]>tag[x])
             {
-                bcc.resize(num+1);
-                while(s.size()&&s.top()!=e)
+                bcc.resize(bcc.size()+1);
+                while(s.top()!=v)
                 {
-                    bcc[num].emplace_back(s.top());
+                    bcc[bcc.size()-1].emplace_back(s.top());
                     s.pop();
                 }
-                bcc[num].emplace_back(s.top());
+                bcc[bcc.size()-1].emplace_back(s.top());
                 s.pop();
-                sort(bcc[num].begin(), bcc[num].end());
-                num++;
+                sort(bcc[bcc.size()-1].begin(),bcc[bcc.size()-1].end());
             }
         }
-        else if(e!=par||(e==par&&vn[x][e]>1)) low[x]=min(low[x],low[e]);
+        else if(tag[v]<tag[x]&&e!=be) low[x]=min(low[x],low[v]);
     }
 }
 
 int main()
 {
     AC
-    int n,m,f,t;
+    int n,m,f,t,num=1;
     cin>>n>>m;
-    v.resize(n),low.resize(n),tag.resize(n),vn.resize(n);
-    while(m--)
+    v.resize(n),low.resize(n),tag.resize(n);
+    for(int i=0;i<m;i++)
     {
         cin>>f>>t;
-        v[f].emplace_back(t);
-        v[t].emplace_back(f);
-        vn[f][t]++;
-        vn[t][f]++;
+        v[f].emplace_back(edge.size());
+        edge.emplace_back(f,t);
+        v[t].emplace_back(edge.size());
+        edge.emplace_back(t,f);
     }
-    dfs(f,f);
-    bcc.resize(num+1);
+    dfs(0,-1);
+    bcc.resize(bcc.size()+1);
     while(s.size())
     {
-        bcc[num].emplace_back(s.top());
+        bcc[bcc.size()-1].emplace_back(s.top());
         s.pop();
     }
-    sort(bcc[num].begin(), bcc[num].end());
+    sort(bcc[bcc.size()-1].begin(),bcc[bcc.size()-1].end());
     sort(bcc.begin(),bcc.end());
-    for(int i=0;i<=num;i++)
+    for (auto e:bcc)
     {
-        cout<<i+1<<": ";
-        for(auto e:bcc[i])
-            cout<<e<<' ';
+        cout<<num++<<": ";
+        for(auto each:e)
+            cout<<each<<' ';
         cout<<'\n';
     }
 }
