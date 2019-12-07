@@ -1,46 +1,37 @@
 #include<bits/stdc++.h>
+#include<bits/extc++.h>
 using namespace std;
-typedef long long ll;
+using namespace __gnu_cxx;
+using namespace __gnu_pbds;
+using ll = long long;
+#define AC ios::sync_with_stdio(0),cin.tie(0);
 
-vector<ll> vec;
-ll n,k;
+int n,k;
+vector<int> v;
 
-bool check(ll m)
+bool slove(int x)
 {
-    ll num=0,count=0;
-    for(ll i=0;i<vec.size();i++)
-    {
-        if(vec[i]>num)
-        {
-            num=vec[i]+m;
-            count++;
-        }
-    }
-    if(count>k) return false;
-    else return true;
+    int cur=v[0]+x,cnt=1;
+    for(int i=1;cnt<k&&i<n;i++)
+        if(v[i]>cur) cnt++,cur=v[i]+x;
+    if(cur>=v[n-1]) return 1;
+    return 0;
 }
 
 int main()
 {
-    ios::sync_with_stdio(0),cin.tie(0);
-    while(cin>>n>>k)
+    AC
+    cin>>n>>k;
+    v.resize(n);
+    for(int i=0;i<n;i++)
+        cin>>v[i];
+    sort(v.begin(),v.end());
+    int l = 1,r=v[n-1]-v[0],ans;
+    while(l<=r)
     {
-        vec.resize(n);
-        for(ll i=0;i<n;i++)
-            cin>>vec[i];
-        sort(vec.begin(),vec.end());
-        if(k==1) cout<<vec[n-1]-vec[0]<<'\n';
-        else
-        {
-            ll l=1,r=(vec[n-1]-vec[0])/k+1;
-            while(l<r)
-            {
-                ll m=(l+r)>>1;
-                if(check(m)) r=m;
-                else l=m+1;
-            }
-            cout<<r<<'\n';
-        }
-        vec.clear();
+        int m=(l+r)>>1;
+        if(slove(m)) ans=m,r=m-1;
+        else l=m+1;
     }
+    cout<<ans<<'\n';
 }
